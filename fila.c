@@ -3,6 +3,14 @@
 
 #define TAMANHO 5
 
+#ifdef _WIN32
+    #define CLEAR_COMMAND "cls"
+    #define PAUSE_COMMAND "pause"
+#else
+    #define CLEAR_COMMAND "clear"
+    #define PAUSE_COMMAND "bash -c 'read -p \"Press Enter to continue...\"'"
+#endif
+
 class Fila {
         public:
                 Fila(bool show = false);
@@ -19,20 +27,47 @@ class Fila {
 };
 
 int main(){
-        Fila obj;
-        int limit = 5;
-        for(int i = 0; i < limit; i++){
-            if(!obj.Inserir(9)){
-                printf("Erro: %d\n",i);
+
+    int option = 1, valor, temp;
+    Fila obj;
+    while(option != 0){
+        system(CLEAR_COMMAND);
+        printf("Fila de numeros inteiros\n\n");
+        printf("1 - Inserir item na fila\n");
+        printf("2 - Retirar item da fila\n");
+        printf("3 - Visualizar fila\n");
+        printf("4 - Ver dados (nao usa fila para mostrar dados, criado apenas para controle interno)\n");
+        printf("0 - Sair\n\n");
+        printf("Opcao: ");
+        scanf("%d",&option);
+        if(option == 1){
+            printf("\nValor: ");
+            scanf("%d",&valor);
+            if(obj.Inserir(valor)){
+                printf("Valor inserido\n");
+            }
+        }else{
+            if (option == 2){
+                printf("Valor retirado: %d\n",obj.Retirar());
             }else{
-                printf("Sucesso: %d\n",i);
+                if (option == 3){
+                    obj.Ver();
+                }else{
+                    if (option == 4){
+                        obj.Dados();
+                    }else{
+                        if (option == 0){
+                            break;
+                        }else{
+                            printf("\nOpcao invalida\n");
+                        }
+                    }
+                }
             }
         }
-        obj.Retirar();
-        obj.Inserir(5);
-        obj.Dados();
-        obj.Ver();
-        return 0;
+        printf("\n");
+        system(PAUSE_COMMAND);
+    }
 }
 
 Fila::Fila(bool show){
@@ -68,7 +103,7 @@ bool Fila::Fila_Vazia(bool show){
 }
 
 bool Fila::Inserir(int valor){
-        if(!Fila_cheia()){
+        if(!Fila_cheia(true)){
             if(Fila_Vazia()){
                 inicio++;
                 fim++;
@@ -89,7 +124,7 @@ bool Fila::Inserir(int valor){
 }
 
 int Fila::Retirar(){
-    if(Fila_Vazia()){
+    if(Fila_Vazia(true)){
         return 0;
     }else{
         int temp = fila[inicio];
@@ -109,7 +144,7 @@ int Fila::Retirar(){
 }
 
 void Fila::Ver(bool show_qtd){
-    if (Fila_Vazia()){
+    if (Fila_Vazia(true)){
         exit(1);
     }
     int qtd, temp;
