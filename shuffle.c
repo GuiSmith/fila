@@ -28,16 +28,24 @@ struct Pessoa {
     int idade;
 };
 
+Pessoa criar(const char *nome, int idade){
+    Pessoa p;
+    p.nome = (char *)malloc(strlen(nome)+1);
+    if (p.nome != nullptr){
+        strcpy(p.nome, nome);
+    }
+    p.idade = idade;
+    return p;
+}
+
 int main() {
     srand(time(NULL)); // Seed the random number generator.
 
     // Array of struct Pessoa
-    struct Pessoa lista[] = {
-        {"Gui", 18},
-        {"Jon", 19},
-        {"Fer", 20}
-    };
+    Pessoa person = criar("Gui",18);
+    printf("%s %d",person.nome, person.idade);
 
+    /*
     // Print original array
     printf("Before shuffling:\n");
     for (int i = 0; i < sizeof(lista) / sizeof(lista[0]); i++) {
@@ -52,6 +60,7 @@ int main() {
     for (int i = 0; i < sizeof(lista) / sizeof(lista[0]); i++) {
         printf("%s %d\n", lista[i].nome, lista[i].idade);
     }
+    */
 
     return 0;
 }
