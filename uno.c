@@ -3,7 +3,7 @@
 #include <time.h>
 #include <string.h>
 
-#define TAMANHO 5
+#define TAMANHO 40
 
 #ifdef _WIN32
     #define CLEAR_COMMAND "cls"
@@ -12,6 +12,25 @@
     #define CLEAR_COMMAND "clear"
     #define PAUSE_COMMAND "bash -c 'read -p \"Press Enter to continue...\"'"
 #endif
+
+static void shuffle(void *array, size_t n, size_t size) {
+    char tmp[size]; // Temporary storage to hold an element during swapping.
+    char *arr = (char *)array; // Treat the input array as a char array (byte by byte).
+    size_t stride = size * sizeof(char); // Calculate the size of each element in bytes.
+
+    if (n > 1) {
+        for (size_t i = 0; i < n - 1; ++i) {
+            // Generate a random index j in the range [i, n-1].
+            size_t rnd = (size_t) rand();
+            size_t j = i + rnd / (RAND_MAX / (n - i) + 1);
+
+            // Swap the elements at positions i and j.
+            memcpy(tmp, arr + j * stride, size); // Copy arr[j] to tmp.
+            memcpy(arr + j * stride, arr + i * stride, size); // Copy arr[i] to arr[j].
+            memcpy(arr + i * stride, tmp, size); // Copy tmp (old arr[j]) to arr[i].
+        }
+    }
+}
 
 struct Carta {
     char *cor;
@@ -37,6 +56,8 @@ class Fila {
                 Carta Retirar();
                 void Ver(bool show_qtd = false);
                 void Dados(); //Fiz isso apenas para ver os dados do vetor, incluindo dados, inicio e fim
+                void Baralho();
+                void Embaralhar();
         private:
                 int inicio = -1;
                 int fim = -1;
@@ -44,18 +65,12 @@ class Fila {
 };
 
 int main(){
-
-    Carta obj = criar("vermelho",9);
-
-    Fila lista;
-    if (lista.Inserir(obj)){
-        printf("OK");
-    }else{
-        printf("Não ok");
-    }
-    lista.Ver();
-    lista.Dados();
-    
+    Fila baralho;
+    baralho.Baralho();
+    baralho.Ver();
+    baralho.Embaralhar();
+    printf("\n\nEmbaralhando\n\n");
+    baralho.Ver();
     printf("\n");
 }
 
@@ -172,4 +187,33 @@ void Fila::Dados(){
                 printf("%d: ", i);
                 printf("%s %d\n",fila[i].cor,fila[i].numero);
         }
+}
+
+void Fila::Baralho(){
+    Carta temp_obj;
+    for (int i = 0; i < 4; i++){
+        for (int j = 0; j < 10; j++){
+            switch(i){
+                case 0:
+                    temp_obj = criar("Vermelho",j);
+                    break;
+                case 1:
+                    temp_obj = criar("Amarelo",j);
+                    break;
+                case 2:
+                    temp_obj = criar("Verde",j);
+                    break;
+                case 3:
+                    temp_obj = criar("Azul",j);
+                    break;
+                default:
+                    temp_obj = criar("",0);
+            }
+            Inserir(temp_obj);
+        }
+    }
+}
+
+void Fila::Embaralhar(){
+    shuffle(fila, sizeof(fila) / sizeof(fila[0]), sizeof(fila[0]));
 }
