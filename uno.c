@@ -69,51 +69,55 @@ class Fila {
 };
 
 int main(){
+    srand(time(NULL));
     Fila baralho;
     system(CLEAR_COMMAND);
-    printf("Criando baralho...\n");
+
+    printf("Criando baralho...");
     baralho.Baralho();
-    printf("Embaralhando...\n");
+
+    printf("\nEmbaralhando...");
     baralho.Embaralhar();
 
     //Criando jogadores
+    printf("\nCriando %d jogadores...",QUANTIDADE_JOGADORES);
     Fila jogadores[QUANTIDADE_JOGADORES];
     for (int i = 0; i < QUANTIDADE_JOGADORES; i++){
         jogadores[i] = Fila();
     }
 
     //Jogadores pegando cartas
+    printf("\nEntregando cartas para jogadores...");
     for (int i = 0; i < 10; i++){
         for (int j = 0; j < QUANTIDADE_JOGADORES; j++){
             jogadores[j].Inserir(baralho.Retirar());
         }
     }
 
-    /*
-    //Mostrando cartas dos jogadores
-    for (int i = 0; i < QUANTIDADE_JOGADORES; i++){
-        printf("\n\n%d° Jogador",i+1);
-        jogadores[i].Ver();
-    }
-    */
-        
+    printf("\nCarregando jogo...");
     bool game_over = false;
     int vencedor_index, perdedor_index = -1, vez = 0, rodadas = 0, menor_baralho_index;
-    Fila* jogador;
+    Fila* jogador = &jogadores[vez];
     Carta carta_descartada;
 
     rodadas++;
     printf("\n\n%d° rodada",rodadas);
     printf("\nJogador da vez: %d",vez);
     carta_descartada = jogador[vez].Retirar();
+    printf("\nDescartou carta: %d %s",carta_descartada.numero,carta_descartada.cor);
     menor_baralho_index = vez;
-    vez++;
+    //Mudando vez
+    if (vez == QUANTIDADE_JOGADORES-1){
+        vez = 0;
+    }else{
+        vez++;
+    }
     while(!game_over){
         rodadas++;
         //Rodadas
         printf("\n\n%d° rodada",rodadas);
         //Vez do jogador
-        printf("Jogador da vez: %d",vez+1);
+        printf("\nJogador da vez: %d",vez);
         jogador = &jogadores[vez];
         Carta carta_na_mao = jogador->Retirar();
         //Última carta descartada
@@ -121,21 +125,21 @@ int main(){
         //Carta na mão do jogador
         printf("\nCarta na mão: %d %s",carta_na_mao.numero,carta_na_mao.cor);
         //Compara carta descartada com carta na mão
-        if (strcmp(carta_descartada.cor,carta_na_mao.cor) || carta_descartada.numero == carta_na_mao.numero){
-            //Descartou carta
+        if (strcmp(carta_descartada.cor,carta_na_mao.cor) == 0 || carta_descartada.numero == carta_na_mao.numero){
+            printf("\nDescartou carta");
             carta_descartada = carta_na_mao;
         }else{
-            //Não descartou carta
+            printf("\nNão descartou carta");
             jogador->Inserir(carta_na_mao);
-            //Compra carta
             carta_na_mao = baralho.Retirar();
+            printf("\nCompra carta: %d %s",carta_na_mao.numero,carta_na_mao.cor);
             
             //Compara carta na mão com carta comprada
-            if(strcmp(carta_descartada.cor,carta_na_mao.cor) || carta_descartada.numero == carta_na_mao.numero){
-                //Descartou carta comprada
+            if(strcmp(carta_descartada.cor,carta_na_mao.cor) == 0 || carta_descartada.numero == carta_na_mao.numero){
+                printf("\nDescartou carta comprada");
                 carta_descartada = carta_na_mao;
             }else{
-                //Não descartou carta e inseriu no próprio baralho
+                printf("\nNão descartou carta e inseriu no próprio baralho");
                 jogador->Inserir(carta_na_mao);
             }
         }
@@ -147,18 +151,21 @@ int main(){
 
         //Se baralho acabar, quem tem menos cartas ganha
         if (baralho.Fila_Vazia()){
+            printf("\n\nO baralho de compra acabou e o jogo foi finalizado");
             vencedor_index = menor_baralho_index;
             game_over = true;
         }
 
         //Se um dos jogadores descartar todas as cartas, este ganha
         if (jogador->Fila_Vazia()){
+            printf("\n\nJogador atual descartou a última carta em seu baralho e ganhou o jogo");
             vencedor_index = vez;
             game_over = true;
         }
 
         //Se um dos jogadores ficar com a própria fila cheia, o jogo acaba e este perde e quem tem a menor fila ganha
-        if (jogador->Fila_cheia()){
+        if (jogador->Quantidade() == 20){
+            printf("\n\nJogador atual comprou sua vigésima carta e perdeu o jogo");
             vencedor_index = menor_baralho_index;
             perdedor_index = vez;
             game_over = true;
@@ -172,7 +179,16 @@ int main(){
             vez++;
         }
     }
-    printf("\nVencedor: %d° jogador",vencedor_index);
+    printf("\n\nVencedor: jogador %d",vencedor_index);
+
+    printf("\n\nSituação dos baralhos");
+    if (baralho.Quantidade() > 0){
+        baralho.Ver();
+    }
+    
+    for (int i = 0; i < QUANTIDADE_JOGADORES; i++){
+        printf("\nJogador %d: %d cartas",i,jogadores[i].Quantidade());
+    }
     printf("\n");
 }
 
