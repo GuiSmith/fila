@@ -98,24 +98,28 @@ int main(){
     */
         
     bool game_over = false;
-    int vencedor_index;
-    int vez = 0;
-    int menor_baralho_index;
+    int vencedor_index, perdedor_index = -1, vez = 0, rodadas = 0, menor_baralho_index;
     Fila* jogador;
     Carta carta_descartada;
-    printf("\n\nRetirando cartas!");
-    printf("Jogador 0 inicia a jogada!");
+
+    rodadas++;
+    printf("\n\n%d° rodada",rodadas);
+    printf("\nJogador da vez: %d",vez);
     carta_descartada = jogador[vez].Retirar();
     menor_baralho_index = vez;
     vez++;
     while(!game_over){
-        printf("Última carta descartada: %d %s", carta_descartada.numero, carta_descartada.cor);
-
+        rodadas++;
+        //Rodadas
+        printf("\n\n%d° rodada",rodadas);
+        //Vez do jogador
+        printf("Jogador da vez: %d",vez+1);
         jogador = &jogadores[vez];
         Carta carta_na_mao = jogador->Retirar();
-
-        printf("\nCarta na mão do %d° jogador: %d, numero %s",vez+1,carta_na_mao.numero,carta_na_mao.cor);
-
+        //Última carta descartada
+        printf("\nÚltima carta descartada: %d %s", carta_descartada.numero, carta_descartada.cor);
+        //Carta na mão do jogador
+        printf("\nCarta na mão: %d %s",carta_na_mao.numero,carta_na_mao.cor);
         //Compara carta descartada com carta na mão
         if (strcmp(carta_descartada.cor,carta_na_mao.cor) || carta_descartada.numero == carta_na_mao.numero){
             //Descartou carta
@@ -140,6 +144,26 @@ int main(){
         if (jogador->Quantidade() <= jogadores[menor_baralho_index].Quantidade()){
             menor_baralho_index = vez;
         }
+
+        //Se baralho acabar, quem tem menos cartas ganha
+        if (baralho.Fila_Vazia()){
+            vencedor_index = menor_baralho_index;
+            game_over = true;
+        }
+
+        //Se um dos jogadores descartar todas as cartas, este ganha
+        if (jogador->Fila_Vazia()){
+            vencedor_index = vez;
+            game_over = true;
+        }
+
+        //Se um dos jogadores ficar com a própria fila cheia, o jogo acaba e este perde e quem tem a menor fila ganha
+        if (jogador->Fila_cheia()){
+            vencedor_index = menor_baralho_index;
+            perdedor_index = vez;
+            game_over = true;
+        }
+        
 
         //Mudando vez
         if (vez == QUANTIDADE_JOGADORES-1){
