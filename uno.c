@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <unistd.h>
 
 #define TAMANHO 40
 #define QUANTIDADE_JOGADORES 2
@@ -48,6 +49,28 @@ Carta criar(const char *cor, int numero){
     return p;
 }
 
+void mostrar_carta(Carta carta) {
+    if(strcmp(carta.cor,"Vermelho") == 0){
+        printf("\033[31m");
+    }
+    if(strcmp(carta.cor,"Amarelo") == 0){
+        printf("\033[33m");
+    }
+    if(strcmp(carta.cor,"Verde") == 0){
+        printf("\033[32m");
+    }
+    if(strcmp(carta.cor,"Azul") == 0){
+        printf("\033[34m");
+    }
+    printf("\n");
+    printf("╔══════╗\n");
+    printf("║  %02d  ║\n", carta.numero);
+    printf("║      ║\n");
+    printf("║      ║\n");
+    printf("╚══════╝\n");
+    printf("\033[0m");
+}
+
 class Fila {
         public:
                 Fila(bool show = false);
@@ -74,13 +97,16 @@ int main(){
     system(CLEAR_COMMAND);
 
     printf("Criando baralho...");
+    sleep(1);
     baralho.Baralho();
 
     printf("\nEmbaralhando...");
+    sleep(1);
     baralho.Embaralhar();
 
     //Criando jogadores
     printf("\nCriando %d jogadores...",QUANTIDADE_JOGADORES);
+    sleep(1);
     Fila jogadores[QUANTIDADE_JOGADORES];
     for (int i = 0; i < QUANTIDADE_JOGADORES; i++){
         jogadores[i] = Fila();
@@ -88,6 +114,7 @@ int main(){
 
     //Jogadores pegando cartas
     printf("\nEntregando cartas para jogadores...");
+    sleep(1);
     for (int i = 0; i < 10; i++){
         for (int j = 0; j < QUANTIDADE_JOGADORES; j++){
             jogadores[j].Inserir(baralho.Retirar());
@@ -95,6 +122,7 @@ int main(){
     }
 
     printf("\nCarregando jogo...");
+    sleep(1);
     bool game_over = false;
     int vencedor_index, perdedor_index = -1, vez = 0, rodadas = 0, menor_baralho_index;
     Fila* jogador = &jogadores[vez];
@@ -105,6 +133,8 @@ int main(){
     printf("\nJogador da vez: %d",vez);
     carta_descartada = jogador[vez].Retirar();
     printf("\nDescartou carta: %d %s",carta_descartada.numero,carta_descartada.cor);
+    mostrar_carta(carta_descartada);
+    sleep(1);
     menor_baralho_index = vez;
     //Mudando vez
     if (vez == QUANTIDADE_JOGADORES-1){
@@ -112,18 +142,29 @@ int main(){
     }else{
         vez++;
     }
+    sleep(1);
     while(!game_over){
+        sleep(1);
         rodadas++;
+        
         //Rodadas
         printf("\n\n%d° rodada",rodadas);
+        
         //Vez do jogador
         printf("\nJogador da vez: %d",vez);
         jogador = &jogadores[vez];
         Carta carta_na_mao = jogador->Retirar();
+        
         //Última carta descartada
         printf("\nÚltima carta descartada: %d %s", carta_descartada.numero, carta_descartada.cor);
+        mostrar_carta(carta_descartada);
+        sleep(1);
+
         //Carta na mão do jogador
         printf("\nCarta na mão: %d %s",carta_na_mao.numero,carta_na_mao.cor);
+        mostrar_carta(carta_na_mao);
+        sleep(1);
+        
         //Compara carta descartada com carta na mão
         if (strcmp(carta_descartada.cor,carta_na_mao.cor) == 0 || carta_descartada.numero == carta_na_mao.numero){
             printf("\nDescartou carta");
@@ -133,6 +174,8 @@ int main(){
             jogador->Inserir(carta_na_mao);
             carta_na_mao = baralho.Retirar();
             printf("\nCompra carta: %d %s",carta_na_mao.numero,carta_na_mao.cor);
+            mostrar_carta(carta_na_mao);
+            sleep(1);
             
             //Compara carta na mão com carta comprada
             if(strcmp(carta_descartada.cor,carta_na_mao.cor) == 0 || carta_descartada.numero == carta_na_mao.numero){
